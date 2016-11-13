@@ -30,6 +30,8 @@ class PidFile(object):
         self._pidfile = pidfile
         self.pidfile = None
 
+        self.testpath()
+
     def __enter__(self):
         self.acquire()
         return self
@@ -40,6 +42,23 @@ class PidFile(object):
             return False
         self.release()
         return True
+
+    def testpath(self):
+        """Test if pifiles path exists and is writable.
+
+        Raises SystemExit if given pidfile path does not
+        exists or is not writable.
+
+
+        :return: None
+        :raise: SystemExit
+        """
+        path = os.path.dirname(self._pidfile)
+        if not os.access(path, os.F_OK):
+            raise SystemExit('PidFile path "' + path +'" does not exists')
+        if not os.access(path, os.W_OK):
+            raise SystemExit('PidFile path "' + path +'" is not writable')
+
 
     def acquire(self):
         """Acquire the pidfile.
